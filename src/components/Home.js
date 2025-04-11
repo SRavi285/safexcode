@@ -5,14 +5,7 @@ import {
   MdQrCodeScanner,
 } from "react-icons/md";
 import heroImg from "../assets/heroimg.jpg";
-import {
-  Box,
-  Typography,
-  Button,
-  Grid,
-  Paper,
-  Container,
-} from "@mui/material";
+import { Box, Typography, Button, Grid, Paper, Container } from "@mui/material";
 
 const features = [
   {
@@ -38,10 +31,10 @@ const plans = [
     price: "₹199",
     month: "6",
     features: [
-      "✅ 1 QR Code", 
-      "✅ Basic call forwarding", 
-      "✅ 24/7 phone support", 
-      "✅ Email support"
+      "✅ 1 QR Code",
+      "✅ Basic call forwarding",
+      "✅ 24/7 phone support",
+      "✅ Email support",
     ],
     popular: false,
     color: "primary",
@@ -117,7 +110,10 @@ const Home = () => {
         <Grid container spacing={4} justifyContent="center" mt={4}>
           {features.map(({ icon, title, text }, index) => (
             <Grid item key={index}>
-              <Paper elevation={3} sx={{ p: 4, textAlign: "center", borderRadius: 4 }}>
+              <Paper
+                elevation={3}
+                sx={{ p: 4, textAlign: "center", borderRadius: 4 }}
+              >
                 {icon}
                 <Typography variant="h5" fontWeight="bold" mt={2}>
                   {title}
@@ -134,7 +130,12 @@ const Home = () => {
       {/* Steps Section */}
       <Box sx={{ backgroundColor: "#f9f9f9", py: 8 }}>
         <Container>
-          <Typography variant="h4" textAlign="center" fontWeight="bold" color="text.secondary">
+          <Typography
+            variant="h4"
+            textAlign="center"
+            fontWeight="bold"
+            color="text.secondary"
+          >
             How It Works
           </Typography>
 
@@ -197,11 +198,14 @@ const Home = () => {
 
         <Grid container spacing={4} justifyContent="center">
           {plans.map((plan, index) => (
-            <Grid item xs={12} md={4} key={index}>
+            <Grid item xs={12} md={4} key={index} sx={{ height: "100%" }}>
               <Paper
                 elevation={4}
                 sx={{
                   p: 4,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
                   textAlign: "center",
                   borderRadius: 4,
                   position: "relative",
@@ -227,7 +231,11 @@ const Home = () => {
                     MOST POPULAR
                   </Box>
                 )}
-                <Typography variant="h5" fontWeight="bold" mt={plan.popular ? 0 : 0}>
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  mt={plan.popular ? 0 : 0}
+                >
                   {plan.title}
                 </Typography>
                 <Typography variant="h6" fontWeight="bold">
@@ -241,10 +249,17 @@ const Home = () => {
                     {feat}
                   </Typography>
                 ))}
+
+                <Box sx={{ flexGrow: 1 }} />
+
                 <Button
                   variant="contained"
                   fullWidth
-                  sx={{ mt: 3, bgcolor: plan.color + ".main", ":hover": { bgcolor: plan.color + ".dark" } }}
+                  sx={{
+                    mt: 3,
+                    bgcolor: plan.color + ".main",
+                    ":hover": { bgcolor: plan.color + ".dark" },
+                  }}
                 >
                   Choose Plan
                 </Button>
