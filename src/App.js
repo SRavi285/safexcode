@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Header from './components/Header'
 import Login from './components/Login';
@@ -12,8 +11,8 @@ import { UserProvider } from './context/UserContext';
 import { ToastContainer } from 'react-toastify';
 import PaymentFailure from './components/PaymentFailure';
 import PaymentSuccess from './components/PaymentSuccess';
-import { UserContext } from './context/UserContext';
 import Home from './components/Home';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -32,6 +31,7 @@ function App() {
           <Route path="/success" element={<PaymentSuccess />} />
           <Route path="/failure" element={<PaymentFailure />} />
         </Routes>
+        <Footer/>
       </Router>
       <ToastContainer />
     </UserProvider>
