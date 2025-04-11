@@ -18,7 +18,7 @@ const salt = 'rjiU3f5AV0VzUG4FSkQRmQwBb2n4XXbi';
 const plans = [
   {
     title: '6 Months Plan',
-    price: 199,
+    price: 2,
     duration: '6 Months',
     gstInfo: 'Including 18% GST',
   },
