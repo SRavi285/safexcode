@@ -36,16 +36,19 @@ const plans = [
   {
     title: "Basic Plan",
     price: "₹199",
-    features: ["✅ 1 QR Code", "✅ Basic call forwarding", "✅ Email support"],
+    month: "6",
+    features: ["✅ 1 QR Code", "✅ Basic call forwarding", "✅ 24/7 phone support", "✅ Email support"],
     popular: false,
     color: "primary",
   },
   {
     title: "Standard",
-    price: "₹599",
+    price: "₹299",
+    month: "12",
     features: [
-      "✅ 3 QR Codes",
+      "✅ 1 QR Codes",
       "✅ Advanced call forwarding",
+      "✅ 24/7 phone support",
       "✅ Priority email support",
       "✅ Call statistics",
     ],
@@ -55,12 +58,13 @@ const plans = [
   {
     title: "Premium",
     price: "₹999",
+    month: "12",
     features: [
-      "✅ Unlimited QR Codes",
+      "✅ 1 QR Codes",
       "✅ Premium call forwarding",
       "✅ 24/7 phone support",
       "✅ Advanced analytics",
-      "✅ Custom QR designs",
+      "✅ Call statistics",
     ],
     popular: false,
     color: "primary",
@@ -225,7 +229,7 @@ const Home = () => {
                   {plan.price}
                 </Typography>
                 <Typography color="gray" mb={2}>
-                  per month
+                  {plan.month}month
                 </Typography>
                 {plan.features.map((feat, i) => (
                   <Typography color="text.secondary" key={i}>
