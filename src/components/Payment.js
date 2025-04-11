@@ -24,7 +24,7 @@ const plans = [
   },
   {
     title: '1 Year Plan',
-    price: 2,
+    price: 299,
     duration: '12 Months',
     gstInfo: 'Including 18% GST',
   },
