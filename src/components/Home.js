@@ -37,7 +37,12 @@ const plans = [
     title: "Basic Plan",
     price: "₹199",
     month: "6",
-    features: ["✅ 1 QR Code", "✅ Basic call forwarding", "✅ 24/7 phone support", "✅ Email support"],
+    features: [
+      "✅ 1 QR Code", 
+      "✅ Basic call forwarding", 
+      "✅ 24/7 phone support", 
+      "✅ Email support"
+    ],
     popular: false,
     color: "primary",
   },
@@ -89,7 +94,7 @@ const Home = () => {
         }}
       >
         <Typography variant="h2" fontWeight="bold" mb={1}>
-          SafeXCode
+          safeXcode
         </Typography>
         <Typography variant="h5" mb={2}>
           Safe and Secure Calling
@@ -103,7 +108,7 @@ const Home = () => {
       {/* Features Section */}
       <Container sx={{ my: 10 }}>
         <Typography variant="h4" textAlign="center" fontWeight="bold" mb={2}>
-          Why Choose SafeXCode
+          Why Choose safeXcode
         </Typography>
         <Typography textAlign="center" color="gray">
           Our innovative QR code solution puts privacy and security first
@@ -192,7 +197,7 @@ const Home = () => {
 
         <Grid container spacing={4} justifyContent="center">
           {plans.map((plan, index) => (
-            <Grid item xs={12} md={3.5} key={index}>
+            <Grid item xs={12} md={4} key={index}>
               <Paper
                 elevation={4}
                 sx={{
@@ -222,14 +227,14 @@ const Home = () => {
                     MOST POPULAR
                   </Box>
                 )}
-                <Typography variant="h5" fontWeight="bold" mt={plan.popular ? 4 : 0}>
+                <Typography variant="h5" fontWeight="bold" mt={plan.popular ? 0 : 0}>
                   {plan.title}
                 </Typography>
                 <Typography variant="h6" fontWeight="bold">
                   {plan.price}
                 </Typography>
                 <Typography color="gray" mb={2}>
-                  {plan.month}month
+                  {plan.month} month
                 </Typography>
                 {plan.features.map((feat, i) => (
                   <Typography color="text.secondary" key={i}>

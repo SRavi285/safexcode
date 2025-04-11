@@ -45,15 +45,15 @@ function Header() {
   const signedInNavItems = [
     { text: 'Home', href: '/home' },
     { text: 'Profile', href: '/profile' },
-    { text: 'About', href: '/about' },
-    { text: 'Privacy', href: '/privacy' }
+    { text: 'About Us', href: '/about' },
+    // { text: 'Privacy', href: '/privacy' }
   ];
 
   const guestNavItems = [
     { text: 'Home', href: '/home' },
     { text: 'Sign In', href: '/login' },
-    { text: 'About', href: '/about' },
-    { text: 'Privacy', href: '/privacy' }
+    { text: 'About Us', href: '/about' },
+    // { text: 'Privacy', href: '/privacy' }
   ];
 
   const drawer = (

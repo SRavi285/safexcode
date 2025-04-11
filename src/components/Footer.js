@@ -65,10 +65,10 @@ const Footer = () => {
           </Typography>
           <Stack spacing={1}>
             <Link component={RouterLink} to="/" color="inherit" underline="hover">Home</Link>
-            <Link component={RouterLink} to="/privacy-policy" color="inherit" underline="hover">Privacy Policy</Link>
-            <Link component={RouterLink} to="/terms-&-conditions" color="inherit" underline="hover">Terms & Conditions</Link>
-            <Link component={RouterLink} to="/about-us" color="inherit" underline="hover">About Us</Link>
-            <Link component={RouterLink} to="/contact" color="inherit" underline="hover">Contact</Link>
+            <Link component={RouterLink} to="/privacy" color="inherit" underline="hover">Privacy Policy</Link>
+            <Link component={RouterLink} to="/termsconditions" color="inherit" underline="hover">Terms & Conditions</Link>
+            <Link component={RouterLink} to="/about" color="inherit" underline="hover">About Us</Link>
+            {/* <Link component={RouterLink} to="/contact" color="inherit" underline="hover">Contact</Link> */}
           </Stack>
         </Grid>
 

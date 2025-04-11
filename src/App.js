@@ -13,6 +13,7 @@ import PaymentFailure from './components/PaymentFailure';
 import PaymentSuccess from './components/PaymentSuccess';
 import Home from './components/Home';
 import Footer from './components/Footer';
+import TermsConditions from './components/TermsConditions';
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/success" element={<PaymentSuccess />} />
           <Route path="/failure" element={<PaymentFailure />} />
+          <Route path='/termsconditions' element={<TermsConditions />}/>
+
         </Routes>
         <Footer/>
       </Router>
