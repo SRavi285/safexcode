@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Grid,
-  Container,
-  Fade
+  Box, Card, CardContent, Typography, Button, Grid, Container, Fade
 } from '@mui/material';
 import { useUser } from '../context/UserContext';
 import SHA512 from 'crypto-js/sha512';
@@ -47,7 +40,8 @@ function Payment() {
     const firstname = user?.name || 'User';
     const email = user?.email || 'test@example.com';
     const phone = user?.phoneNumber || '9999999999';
-    const paymentType = plan.duration === '6 Months' ? '6months' : '1Year';
+    const paymentType = plan.duration === '6 Months' ? '6months' : '1year';
+
     localStorage.setItem('selectedPaymentType', paymentType);
 
     const hash = generatePayUHash({
@@ -90,13 +84,7 @@ function Payment() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%)',
-        py: 8,
-      }}
-    >
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%)', py: 8 }}>
       <Container maxWidth="md">
         <Box textAlign="center" mb={6}>
           <Typography variant="h3" fontWeight="bold" gutterBottom>

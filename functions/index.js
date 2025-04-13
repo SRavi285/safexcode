@@ -1,6 +1,10 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const crypto = require('crypto');
 admin.initializeApp();
+
+const merchantKey = 'oTq3Pd';
+const salt = 'rjiU3f5AV0VzUG4FSkQRmQwBb2n4XXbi';
 
 exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
   try {
@@ -8,13 +12,26 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
 
     const {
       mihpayid,
+      txnid,
       amount,
       email,
       phone,
       productinfo,
+      firstname,
+      status,
+      hash: posted_hash,
     } = req.body;
 
-    // 🔍 Fetch UID from users collection using email
+    // ✅ Verify hash (prevent tampering)
+    const hashSequence = `${salt}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${merchantKey}`;
+    const calculatedHash = crypto.createHash('sha512').update(hashSequence).digest('hex');
+
+    if (calculatedHash !== posted_hash) {
+      console.error('❌ Hash mismatch. Payment may be tampered.');
+      return res.status(400).send('Invalid payment hash');
+    }
+
+    // 🔍 Find user by email
     const usersRef = admin.firestore().collection('users');
     const userSnapshot = await usersRef.where('email', '==', email).limit(1).get();
 
@@ -26,7 +43,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     const userDoc = userSnapshot.docs[0];
     const userId = userDoc.id;
 
-    // 📅 Handle dates
+    // 📅 Calculate plan duration
     const planDuration = productinfo.includes('6 Months') ? '6months' : '1year';
     const durationMonths = planDuration === '6months' ? 6 : 12;
 
@@ -34,6 +51,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + durationMonths);
 
+    // 🧾 Prepare subscription data
     const subscriptionData = {
       amount: Number(amount),
       codeId: planDuration,
@@ -51,12 +69,17 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       userId: userId,
     };
 
-    // ✅ Add to Firestore
+    // 💾 Save subscription
     await admin.firestore().collection('subscription').add(subscriptionData);
-    console.log('🎉 Subscription saved:', subscriptionData);
 
-    // res.redirect(302, 'http://localhost:3000/success'); // ✅ Change to production URL later
-    res.redirect(302, 'https://www.safexcoe.com/success');
+    // ✅ Mark user as paid
+    await usersRef.doc(userId).update({
+      isPaymentDone: true,
+      paymentType: planDuration,
+    });
+
+    console.log('🎉 Subscription saved and user updated:', subscriptionData);
+    res.redirect(302, 'https://www.safexcode.com/success');
   } catch (error) {
     console.error('🔥 Error handling payment success:', error);
     res.status(500).send('Something went wrong');
@@ -65,7 +88,5 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
 
 exports.payuFailureRedirect = functions.https.onRequest((req, res) => {
   console.log('❌ PayU Failure:', req.body);
-   // ✅ Change to production URL later
-  // res.redirect(302, 'http://localhost:3000/failure');
-  res.redirect(302, 'https://www.safexcoe.com/failure');
+  res.redirect(302, 'https://www.safexcode.com/failure');
 });
