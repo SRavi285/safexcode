@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -6,30 +6,31 @@ import {
   Typography,
   Paper,
   CircularProgress,
-} from '@mui/material';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
-import { UserContext } from '../context/UserContext';
-import { motion } from 'framer-motion'; // 💥 Animation
+} from "@mui/material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
+import { UserContext } from "../context/UserContext";
+import { motion } from "framer-motion"; // 💥 Animation
+import Logoimage from "../assets/logo-color01.png";
 
 function Login() {
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [otp, setOtp] = useState('');
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [otp, setOtp] = useState("");
   const [sentOtp, setSentOtp] = useState(0);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useContext(UserContext);
 
   const handleSendOTP = async () => {
     if (!/^[0-9]{10}$/.test(mobileNumber)) {
-      setError('Please enter a valid 10-digit mobile number');
+      setError("Please enter a valid 10-digit mobile number");
       return;
     }
-    setError('');
+    setError("");
     setLoading(true);
     const generatedOtp = Math.floor(100000 + Math.random() * 900000);
 
@@ -39,13 +40,13 @@ function Login() {
       );
       if (response.data.return) {
         setSentOtp(generatedOtp);
-        toast.success('OTP sent!');
+        toast.success("OTP sent!");
       } else {
-        setError('Failed to send OTP.');
+        setError("Failed to send OTP.");
       }
     } catch (err) {
       console.error(err);
-      setError('Error sending OTP.');
+      setError("Error sending OTP.");
     } finally {
       setLoading(false);
     }
@@ -53,47 +54,50 @@ function Login() {
 
   const handleVerifyOTP = async () => {
     if (!otp) {
-      setError('Please enter the OTP');
+      setError("Please enter the OTP");
       return;
     }
     if (parseInt(otp) !== sentOtp) {
-      setError('Invalid OTP');
+      setError("Invalid OTP");
       return;
     }
 
     try {
-      const q = query(collection(db, 'users'), where('phoneNumber', '==', mobileNumber));
+      const q = query(
+        collection(db, "users"),
+        where("phoneNumber", "==", mobileNumber)
+      );
       const snapshot = await getDocs(q);
 
       if (!snapshot.empty) {
         const userData = snapshot.docs[0].data();
         login(userData);
-        toast.success('Login successful!');
+        toast.success("Login successful!");
 
         if (userData.isPaymentDone) {
-          navigate('/profile');
+          navigate("/profile");
         } else {
-          navigate('/payment');
+          navigate("/payment");
         }
       } else {
-        navigate('/signup', { state: { mobileNumber } });
+        navigate("/signup", { state: { mobileNumber } });
       }
     } catch (err) {
       console.error(err);
-      setError('Login error');
+      setError("Login error");
     }
   };
 
   return (
     <Box
       sx={{
-        minHeight: '60vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "60vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         py: { xs: 4, sm: 6, md: 8 }, // responsive padding top/bottom
-        boxSizing: 'border-box',
+        boxSizing: "border-box",
       }}
     >
       {/* Logo + Heading */}
@@ -101,12 +105,20 @@ function Login() {
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        style={{ textAlign: 'center', marginBottom: '20px' }}
+        style={{ textAlign: "center", marginBottom: "20px" }}
       >
-        <Box sx={{ fontSize: 48 }}>🛡️</Box> {/* Logo Icon - you can replace this with your own logo */}
-        <Typography variant="h4" fontWeight="bold" color="primary">
-          Welcome to SafeXCode
-        </Typography>
+        {/* <Box sx={{ fontSize: 48 }}>🛡️</Box>{" "} */}
+        {/* Logo Icon - you can replace this with your own logo */}
+        {/* <Typography variant="h4" fontWeight="bold" color="primary">
+          Welcome to safeXcode
+        </Typography> */}
+        {/* logo image  */}
+        <Box
+          component="img"
+          src={Logoimage}
+          alt="Responsive Image"
+          sx={{ width: "60%", maxHeight: 40, objectFit: "cover" }}
+        />
       </motion.div>
 
       {/* Login Card */}
@@ -114,17 +126,17 @@ function Login() {
         elevation={6}
         sx={{
           p: 4,
-          borderRadius: '20px',
+          borderRadius: "20px",
           maxWidth: 400,
-          width: '100%',
-          textAlign: 'center',
-          backdropFilter: 'blur(10px)',
-          background: 'rgba(255, 255, 255, 0.85)',
-          boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
+          width: "100%",
+          textAlign: "center",
+          backdropFilter: "blur(10px)",
+          background: "rgba(255, 255, 255, 0.85)",
+          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Typography variant="h6" fontWeight="600" mb={3}>
-          Sign in with your mobile number
+          Sign up with your mobile number
         </Typography>
 
         {!sentOtp ? (
@@ -145,9 +157,13 @@ function Login() {
               size="large"
               onClick={handleSendOTP}
               disabled={loading}
-              sx={{ borderRadius: '12px', fontWeight: 'bold', py: 1.5 }}
+              sx={{ borderRadius: "12px", fontWeight: "bold", py: 1.5 }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Send OTP'}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Send OTP"
+              )}
             </Button>
           </>
         ) : (
@@ -167,7 +183,7 @@ function Login() {
               fullWidth
               size="large"
               onClick={handleVerifyOTP}
-              sx={{ borderRadius: '12px', fontWeight: 'bold', py: 1.5 }}
+              sx={{ borderRadius: "12px", fontWeight: "bold", py: 1.5 }}
             >
               Verify OTP
             </Button>
