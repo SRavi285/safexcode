@@ -1,5 +1,11 @@
 {
   "projects": {
     "default": "safecode-001"
+  },
+  "targets": {},
+  "etags": {
+    "safecode-001": {
+      "extensionInstances": {}
+    }
   }
 }

@@ -25,49 +25,7 @@ const features = [
   },
 ];
 
-const plans = [
-  {
-    title: "Basic Plan",
-    price: "₹199",
-    month: "6",
-    features: [
-      "✅ 1 QR Code",
-      "✅ Basic call forwarding",
-      "✅ 24/7 phone support",
-      "✅ Email support",
-    ],
-    popular: false,
-    color: "primary",
-  },
-  {
-    title: "Standard",
-    price: "₹299",
-    month: "12",
-    features: [
-      "✅ 1 QR Codes",
-      "✅ Advanced call forwarding",
-      "✅ 24/7 phone support",
-      "✅ Priority email support",
-      "✅ Call statistics",
-    ],
-    popular: true,
-    color: "warning",
-  },
-  {
-    title: "Premium",
-    price: "₹999",
-    month: "12",
-    features: [
-      "✅ 1 QR Codes",
-      "✅ Premium call forwarding",
-      "✅ 24/7 phone support",
-      "✅ Advanced analytics",
-      "✅ Call statistics",
-    ],
-    popular: false,
-    color: "primary",
-  },
-];
+
 
 const Home = () => {
   return (
@@ -187,87 +145,6 @@ const Home = () => {
         </Container>
       </Box>
 
-      {/* Plans Section */}
-      <Container sx={{ py: 8 }}>
-        <Typography variant="h4" textAlign="center" fontWeight="bold" mb={1}>
-          Subscription Plans
-        </Typography>
-        <Typography textAlign="center" color="gray" mb={4}>
-          Choose the plan that fits your needs
-        </Typography>
-
-        <Grid container spacing={4} justifyContent="center">
-          {plans.map((plan, index) => (
-            <Grid item xs={12} md={4} key={index} sx={{ height: "100%" }}>
-              <Paper
-                elevation={4}
-                sx={{
-                  p: 4,
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  textAlign: "center",
-                  borderRadius: 4,
-                  position: "relative",
-                  border: plan.popular ? "2px solid #ffb300" : "none",
-                }}
-              >
-                {plan.popular && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: -12,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      bgcolor: "warning.main",
-                      px: 2,
-                      py: 0.5,
-                      borderRadius: "16px",
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: 12,
-                    }}
-                  >
-                    MOST POPULAR
-                  </Box>
-                )}
-                <Typography
-                  variant="h5"
-                  fontWeight="bold"
-                  mt={plan.popular ? 0 : 0}
-                >
-                  {plan.title}
-                </Typography>
-                <Typography variant="h6" fontWeight="bold">
-                  {plan.price}
-                </Typography>
-                <Typography color="gray" mb={2}>
-                  {plan.month} month
-                </Typography>
-                {plan.features.map((feat, i) => (
-                  <Typography color="text.secondary" key={i}>
-                    {feat}
-                  </Typography>
-                ))}
-
-                <Box sx={{ flexGrow: 1 }} />
-
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    mt: 3,
-                    bgcolor: plan.color + ".main",
-                    ":hover": { bgcolor: plan.color + ".dark" },
-                  }}
-                >
-                  Choose Plan
-                </Button>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
     </Box>
   );
 };
