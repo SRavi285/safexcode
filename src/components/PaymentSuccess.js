@@ -27,7 +27,7 @@ function PaymentSuccess() {
         if (!snapshot.empty) {
           const userData = snapshot.docs[0].data();
           const isPaymentDone = userData?.isPaymentDone || false;
-
+          console.log("isPaymentDone", isPaymentDone)
           if (!isPaymentDone) {
             navigate('/payment');
           }

@@ -134,7 +134,7 @@ function Signup() {
       lastCallTime: null,
       mobile_number: `+91${mobileNumber}`,
       qrType: 'digital',
-      subscriptionStatus: 'trial',
+      subscriptionStatus: 'free',
       trialExpiry: trialExpiry.toISOString(),
       uniqueCode: uniqueCode,
       userId: uid,

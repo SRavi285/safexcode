@@ -43,7 +43,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     const userDoc = userSnapshot.docs[0];
     const userId = userDoc.id;
 
-    // 📅 Calculate plan duration
+    // 📅 Determine subscription type
     const planDuration = productinfo.includes('6 Months') ? '6months' : '1year';
     const durationMonths = planDuration === '6months' ? 6 : 12;
 
@@ -59,8 +59,8 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       currency: 'INR',
       email: email || '',
       phoneNumber: phone || '',
-      startDate: admin.firestore.Timestamp.fromDate(startDate),
-      endDate: admin.firestore.Timestamp.fromDate(endDate),
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
       remainingCalls: 100,
       remainingMinutes: 100,
       status: 'active',
@@ -78,7 +78,21 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       paymentType: planDuration,
     });
 
-    console.log('🎉 Subscription saved and user updated:', subscriptionData);
+    // 🔄 Update subscriptionStatus in uuid collection
+    const uuidRef = admin.firestore().collection('uuid');
+    const uuidSnapshot = await uuidRef.where('userId', '==', userId).limit(1).get();
+
+    if (!uuidSnapshot.empty) {
+      const uuidDoc = uuidSnapshot.docs[0];
+      await uuidRef.doc(uuidDoc.id).update({
+        subscriptionStatus: planDuration,
+      });
+      console.log('📦 uuid.subscriptionStatus updated to:', planDuration);
+    } else {
+      console.warn('⚠️ No uuid document found for user:', userId);
+    }
+
+    console.log('🎉 Subscription saved and user + uuid updated:', subscriptionData);
     res.redirect(302, 'https://www.safexcode.com/success');
   } catch (error) {
     console.error('🔥 Error handling payment success:', error);
