@@ -24,9 +24,15 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
 
     // ✅ Verify hash (prevent tampering)
     const hashSequence = `${salt}|${status}|||||||||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${merchantKey}`;
-    const calculatedHash = crypto.createHash('sha512').update(hashSequence).digest('hex');
+    const calculatedHash = crypto.createHash('sha512').update(hashSequence).digest('hex').toLowerCase();
 
-    if (calculatedHash !== posted_hash) {
+
+    // if (calculatedHash !== posted_hash) {
+    //   console.error('❌ Hash mismatch. Payment may be tampered.');
+    //   return res.status(400).send('Invalid payment hash');
+    // }
+
+    if (calculatedHash !== posted_hash.toLowerCase()) {
       console.error('❌ Hash mismatch. Payment may be tampered.');
       return res.status(400).send('Invalid payment hash');
     }
@@ -47,10 +53,14 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     const planDuration = productinfo.includes('6 Months') ? '6months' : '1year';
     const durationMonths = planDuration === '6months' ? 6 : 12;
 
-    const startDate = new Date();
+
+    // convert the date in string
+    const startDate = new Date().toISOString();
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + durationMonths);
+    const endDateStr = endDate.toISOString();
 
+    
     // 🧾 Prepare subscription data
     const subscriptionData = {
       amount: Number(amount),
@@ -59,8 +69,8 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       currency: 'INR',
       email: email || '',
       phoneNumber: phone || '',
-      startDate: admin.firestore.Timestamp.fromDate(startDate),
-      endDate: admin.firestore.Timestamp.fromDate(endDate),
+      startDate: startDate,
+      endDate: endDateStr,
       remainingCalls: 100,
       remainingMinutes: 100,
       status: 'active',
@@ -77,6 +87,22 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       isPaymentDone: true,
       paymentType: planDuration,
     });
+
+
+    // add some changes to user document and subscription document
+
+    const db = admin.firestore();
+     
+     // Update user table
+     await db.collection('users').doc(userId).update({
+      userType: planDuration,
+     });
+
+     // Update uuid table
+     await db.collection('uuid').doc(userId).update({
+      subscriptionStatus: planDuration,
+     })
+
 
     console.log('🎉 Subscription saved and user updated:', subscriptionData);
     res.redirect(302, 'https://www.safexcode.com/success');

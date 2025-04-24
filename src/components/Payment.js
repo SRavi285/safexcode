@@ -65,6 +65,7 @@ function Payment() {
       furl: 'https://us-central1-safecode-001.cloudfunctions.net/payuFailureRedirect',
       hash,
       service_provider: 'payu_paisa',
+      udf1: paymentType, // custom field to pass planId to backend
     };
 
     const form = document.createElement('form');
