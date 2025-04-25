@@ -123,6 +123,7 @@ function Signup() {
       totalActiveCodes: 1,
       userHash: '',
       vehicleCode: '',
+      userType: '',
     };
 
     const uuidData = {
