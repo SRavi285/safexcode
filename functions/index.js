@@ -89,8 +89,10 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       currency: "INR",
       email: email || "",
       phoneNumber: phone || "",
-      startDate: admin.firestore.Timestamp.fromDate(startDate),
-      endDate: admin.firestore.Timestamp.fromDate(endDate),
+      startDate: `${admin.firestore.Timestamp.fromDate(startDate)}`,
+      endDate: `${admin.firestore.Timestamp.fromDate(endDate)}`,
+      // startDate: admin.firestore.Timestamp.fromDate(startDate),
+      // endDate: admin.firestore.Timestamp.fromDate(endDate),
       remainingCalls: 100,
       remainingMinutes: 100,
       status: "active",
@@ -112,6 +114,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     const uuidRef = admin.firestore().collection("uuid");
     const uuidSnapshot = await uuidRef
       .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
       .limit(1)
       .get();
 
