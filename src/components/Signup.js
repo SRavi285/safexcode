@@ -135,14 +135,14 @@ function Signup() {
       lastCallTime: null,
       mobile_number: `+91${mobileNumber}`,
       qrType: 'digital',
-      subscriptionStatus: 'free',
+      subscriptionStatus: 'trial',
       trialExpiry: trialExpiry.toISOString(),
       uniqueCode: uniqueCode,
       userId: uid,
     };
 
     try {
-      await setDoc(doc(db, 'users', uid), userData);
+      await addDoc(collection(db, 'users'), userData);
       await setDoc(doc(db, 'uuid', uniqueCode), uuidData);
 
       login(userData);
