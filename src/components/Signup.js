@@ -142,7 +142,8 @@ function Signup() {
     };
 
     try {
-      await setDoc(doc(db, 'users', uid), userData);
+      // await setDoc(doc(db, 'users', uid), userData);
+      await addDoc(collection(db, 'users'), userData); // Use the default uid
       await setDoc(doc(db, 'uuid', uniqueCode), uuidData);
 
       login(userData);
