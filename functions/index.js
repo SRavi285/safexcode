@@ -52,7 +52,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     console.log("Calculated Hash:", calculatedHash);
 
     // Compare with posted_hash
-    if (calculatedHash !== posted_hash.toLowerCase()) {
+    if (calculatedHash !== posted_hash?.toLowerCase()) {
       console.error("❌ Hash mismatch. Payment may be tampered.");
       return res.status(400).send("Invalid payment hash");
     }
@@ -71,6 +71,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
 
     const userDoc = userSnapshot.docs[0];
     const userId = userDoc.id;
+    const userUid = userDoc.data().uid;
 
     // 📅 Determine subscription type
     const planDuration = productinfo.includes("6 Months") ? "6months" : "1year";
@@ -89,8 +90,8 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       currency: "INR",
       email: email || "",
       phoneNumber: phone || "",
-      startDate: `${admin.firestore.Timestamp.fromDate(startDate)}`,
-      endDate: `${admin.firestore.Timestamp.fromDate(endDate)}`,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
       // startDate: admin.firestore.Timestamp.fromDate(startDate),
       // endDate: admin.firestore.Timestamp.fromDate(endDate),
       remainingCalls: 100,
@@ -98,7 +99,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       status: "active",
       timestamp: admin.firestore.Timestamp.fromDate(startDate),
       transactionId: mihpayid,
-      userId: userId,
+      userid: userUid,
     };
 
     // 💾 Save subscription
@@ -113,8 +114,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
     // 🔄 Update subscriptionStatus in uuid collection
     const uuidRef = admin.firestore().collection("uuid");
     const uuidSnapshot = await uuidRef
-      .where("userId", "==", userId)
-      .orderBy("createdAt", "desc")
+      .where("userId", "==", userUid)
       .limit(1)
       .get();
 
@@ -125,7 +125,7 @@ exports.payuSuccessRedirect = functions.https.onRequest(async (req, res) => {
       });
       console.log("📦 uuid.subscriptionStatus updated to:", planDuration);
     } else {
-      console.warn("⚠️ No uuid document found for user:", userId);
+      console.warn("⚠️ No uuid document found for user:", userUid);
     }
 
     console.log(
