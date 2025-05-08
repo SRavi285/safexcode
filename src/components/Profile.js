@@ -14,6 +14,10 @@ import {
   useMediaQuery,
   TextField,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useUser } from "../context/UserContext";
 import {
@@ -23,7 +27,9 @@ import {
   getDocs,
   doc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
+import { getAuth, signOut } from "firebase/auth";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -35,15 +41,21 @@ import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
 
 const Profile = () => {
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
-  const [profileImage, setProfileImage] = useState(null); // State for profile image
+  const [profileImage, setProfileImage] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
 
   useEffect(() => {
     if (!user?.uid) {
@@ -60,8 +72,8 @@ const Profile = () => {
         if (!snapshot.empty) {
           const data = snapshot.docs[0].data();
           setUserData(data);
-          setEditedData(data); // Initialize editedData with existing data
-          setProfileImage(data.profileImage || null); // Load existing profile image
+          setEditedData(data);
+          setProfileImage(data.profileImage || null);
         }
       } catch (err) {
         console.error("Error fetching user data:", err);
@@ -85,12 +97,11 @@ const Profile = () => {
 
       if (!snapshot.empty) {
         const userDoc = snapshot.docs[0];
-        // Include profile image in the update
         await updateDoc(doc(db, "users", userDoc.id), {
           ...editedData,
           profileImage,
         });
-        setUserData({ ...editedData, profileImage }); // Update userData with edited data
+        setUserData({ ...editedData, profileImage });
         setIsEditMode(false);
         toast.success("Profile updated successfully!");
       } else {
@@ -118,6 +129,43 @@ const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const confirmDeleteProfile = async () => {
+    try {
+      const usersSnapshot = await getDocs(
+        query(collection(db, "users"), where("uid", "==", user.uid))
+      );
+      usersSnapshot.forEach(async (docSnap) => {
+        await deleteDoc(doc(db, "users", docSnap.id));
+      });
+
+      const subSnapshot = await getDocs(
+        query(collection(db, "subscription"), where("phoneNumber", "==", userData.phoneNumber))
+      );
+      subSnapshot.forEach(async (docSnap) => {
+        await deleteDoc(doc(db, "subscription", docSnap.id));
+      });
+
+      const uuidSnapshot = await getDocs(
+        query(collection(db, "uuid"), where("mobile_number", "==", `+91${userData.phoneNumber}`))
+      );
+      uuidSnapshot.forEach(async (docSnap) => {
+        await deleteDoc(doc(db, "uuid", docSnap.id));
+      });
+
+      const auth = getAuth();
+      await signOut(auth);
+      logout();
+      toast.success("Profile deleted successfully.");
+      navigate("/login");
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+      toast.error("Failed to delete profile. Try again.");
+    } finally {
+      setDeleteDialogOpen(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -154,14 +202,13 @@ const Profile = () => {
               color: "white",
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between", // Add this line
+              justifyContent: "space-between",
               gap: 2,
               flexDirection: isMobile ? "column" : "row",
               textAlign: isMobile ? "center" : "left",
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {/* Profile Image */}
               <Box sx={{ position: "relative", display: "inline-block" }}>
                 <label htmlFor="profile-image-upload">
                   <input
@@ -217,26 +264,35 @@ const Profile = () => {
                 </Typography>
               </Box>
             </Box>
-            {/* Edit and Save Buttons */}
-            {isEditMode ? (
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SaveIcon />}
-                onClick={handleSaveClick}
-              >
-                Save
-              </Button>
-            ) : (
+
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+              {isEditMode ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<SaveIcon />}
+                  onClick={handleSaveClick}
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<EditIcon />}
+                  onClick={handleEditClick}
+                >
+                  Edit Profile
+                </Button>
+              )}
               <Button
                 variant="outlined"
-                color="primary"
-                startIcon={<EditIcon />}
-                onClick={handleEditClick}
+                color="error"
+                onClick={handleDeleteClick}
               >
-                Edit Profile
+                Delete Profile
               </Button>
-            )}
+            </Box>
           </Box>
 
           <CardContent>
@@ -310,72 +366,53 @@ const Profile = () => {
                   Address Details 📍
                 </Typography>
                 <Box sx={{ pl: 2 }}>
-                  {isEditMode ? (
-                    <TextField
-                      name="address"
-                      label="Address"
-                      value={editedData.address || "N/A"}
-                      onChange={handleInputChange}
-                      fullWidth
-                      size="small"
-                      margin="normal"
-                    />
-                  ) : (
-                    <Typography>
-                      <strong>Address:</strong> {userData.address || "N/A"}
-                    </Typography>
-                  )}
-                  {isEditMode ? (
-                    <TextField
-                      name="city"
-                      label="City"
-                      value={editedData.city || "N/A"}
-                      onChange={handleInputChange}
-                      fullWidth
-                      size="small"
-                      margin="normal"
-                    />
-                  ) : (
-                    <Typography>
-                      <strong>City:</strong> {userData.city || "N/A"}
-                    </Typography>
-                  )}
-                  {isEditMode ? (
-                    <TextField
-                      name="state"
-                      label="State"
-                      value={editedData.state || "N/A"}
-                      onChange={handleInputChange}
-                      fullWidth
-                      size="small"
-                      margin="normal"
-                    />
-                  ) : (
-                    <Typography>
-                      <strong>State:</strong> {userData.state || "N/A"}
-                    </Typography>
-                  )}
-                  {isEditMode ? (
-                    <TextField
-                      name="pinCode"
-                      label="Pin Code"
-                      value={editedData.pinCode || "N/A"}
-                      onChange={handleInputChange}
-                      fullWidth
-                      size="small"
-                      margin="normal"
-                    />
-                  ) : (
-                    <Typography>
-                      <strong>Pin Code:</strong> {userData.pinCode || "N/A"}
-                    </Typography>
-                  )}
+                  {["address", "city", "state", "pinCode"].map((field) => (
+                    <div key={field}>
+                      {isEditMode ? (
+                        <TextField
+                          name={field}
+                          label={field[0].toUpperCase() + field.slice(1)}
+                          value={editedData[field] || "N/A"}
+                          onChange={handleInputChange}
+                          fullWidth
+                          size="small"
+                          margin="normal"
+                        />
+                      ) : (
+                        <Typography>
+                          <strong>{field[0].toUpperCase() + field.slice(1)}:</strong>{" "}
+                          {userData[field] || "N/A"}
+                        </Typography>
+                      )}
+                    </div>
+                  ))}
                 </Box>
               </Grid>
             </Grid>
           </CardContent>
         </Card>
+
       </Grow>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Profile Deletion</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete your profile? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteProfile} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Container>
   );
 };
