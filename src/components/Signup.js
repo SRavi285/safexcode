@@ -217,10 +217,11 @@ function Signup() {
           <TextField
             label="Mobile Number"
             value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
+            // onChange={(e) => setMobileNumber(e.target.value)}
             fullWidth
             error={!!errors.mobileNumber}
             helperText={errors.mobileNumber}
+            disabled
           />
           <TextField
             label="Pincode"

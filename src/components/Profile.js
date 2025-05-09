@@ -28,6 +28,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  addDoc,
 } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
 import { db } from "../firebase";
@@ -52,10 +53,62 @@ const Profile = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const [agreementChecked, setAgreementChecked] = useState([]);
+
+  useEffect(() => {
+    setAgreementChecked(new Array(agreementData.length).fill(false));
+  },[]);
+
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
   };
 
+  // handle check list deleting account
+  const handleAgreementChange = (index) => {
+    const updatedChecked = [...agreementChecked];
+    updatedChecked[index] = !updatedChecked[index];
+    setAgreementChecked(updatedChecked);
+  };
+
+  const agreementData = [
+    {
+      id: 1,
+      data: "I want to create a new account with a different mobile number.",
+    },
+    {
+      id: 2,
+      data: "I created a duplicate acount",
+    },
+    {
+      id: 3,
+      data: "I no longer need the service.",
+    },
+    {
+      id: 4,
+      data: "i had a bad service.",
+    },
+    {
+      id: 5,
+      data: "Facing technical issues.",
+    },
+    {
+      id: 6,
+      data: "Privacy concerns.",
+    },
+
+    {
+      id: 7,
+      data: "Too many emails or notifications.",
+    },
+    {
+      id: 8,
+      data: "Service is not useful for me currently",
+    },
+    {
+      id: 9,
+      data: "Other(Please specify)",
+    },
+  ];
 
   useEffect(() => {
     if (!user?.uid) {
@@ -140,17 +193,36 @@ const Profile = () => {
       });
 
       const subSnapshot = await getDocs(
-        query(collection(db, "subscription"), where("phoneNumber", "==", userData.phoneNumber))
+        query(
+          collection(db, "subscription"),
+          where("phoneNumber", "==", userData.phoneNumber)
+        )
       );
       subSnapshot.forEach(async (docSnap) => {
         await deleteDoc(doc(db, "subscription", docSnap.id));
       });
 
       const uuidSnapshot = await getDocs(
-        query(collection(db, "uuid"), where("mobile_number", "==", `+91${userData.phoneNumber}`))
+        query(
+          collection(db, "uuid"),
+          where("mobile_number", "==", `+91${userData.phoneNumber}`)
+        )
       );
       uuidSnapshot.forEach(async (docSnap) => {
         await deleteDoc(doc(db, "uuid", docSnap.id));
+      });
+
+      // add doc deleted user
+      const selectedReasons = agreementData
+        .filter((_, i) => agreementChecked[i])
+        .map((item) => item.data);
+
+      await addDoc(collection(db, "deletedAccounts"), {
+        uid: user.uid,
+        phoneNumber: userData.phoneNumber,
+        email: userData.email,
+        reasons: selectedReasons,
+        deletedAt: new Date(),
       });
 
       const auth = getAuth();
@@ -165,7 +237,6 @@ const Profile = () => {
       setDeleteDialogOpen(false);
     }
   };
-
 
   if (loading) {
     return (
@@ -380,7 +451,9 @@ const Profile = () => {
                         />
                       ) : (
                         <Typography>
-                          <strong>{field[0].toUpperCase() + field.slice(1)}:</strong>{" "}
+                          <strong>
+                            {field[0].toUpperCase() + field.slice(1)}:
+                          </strong>{" "}
                           {userData[field] || "N/A"}
                         </Typography>
                       )}
@@ -391,7 +464,6 @@ const Profile = () => {
             </Grid>
           </CardContent>
         </Card>
-
       </Grow>
       <Dialog
         open={deleteDialogOpen}
@@ -400,19 +472,38 @@ const Profile = () => {
         <DialogTitle>Confirm Profile Deletion</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete your profile? This action cannot be undone.
+            Are you sure you want to delete your profile? This action cannot be
+            undone.
           </Typography>
+
+          {/* checklist who's want to delete account */}
+          {agreementData.map((item, index) => (
+            <Box key={item.id} mt={2}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={agreementChecked[index] || false}
+                  onChange={() => handleAgreementChange(index)}
+                  style={{ marginRight: "8px" }}
+                />
+                {item.data}
+              </label>
+            </Box>
+          ))}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={confirmDeleteProfile} color="error" variant="contained">
+          <Button
+            onClick={confirmDeleteProfile}
+            color="error"
+            variant="contained"
+          >
             Delete
           </Button>
         </DialogActions>
       </Dialog>
-
     </Container>
   );
 };
